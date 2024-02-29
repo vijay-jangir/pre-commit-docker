@@ -37,4 +37,4 @@ WORKDIR /home/pre-commit/
 COPY .pre-commit-config.yaml README.md ./
 USER pre-commit
 
-ENTRYPOINT [ "/bin/sh" ]
+ENTRYPOINT []
