@@ -4,7 +4,7 @@ ARG PYTHON_VERSION=3.11.8
 ARG VARIANT=alpine
 FROM python:${PYTHON_VERSION}-${VARIANT}
 ARG PRE_COMMIT_VERSION=3.6.2
-ARG PACKAGES_LIST="git bash openjdk21 maven"
+ARG PACKAGES_LIST="git bash"
 
 LABEL maintainer="Vijay Jangir <6284383+vijay-jangir@users.noreply.github.com>" \
       version="1.0" \
