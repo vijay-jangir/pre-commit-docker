@@ -3,7 +3,7 @@
 ARG PYTHON_VERSION=3.11.8
 ARG VARIANT=alpine
 FROM python:${PYTHON_VERSION}-${VARIANT}
-ARG PRE_COMMIT_VERSION=3.6.2
+ARG PRE_COMMIT_VERSION=3.7.0
 ARG PACKAGES_LIST="bash"
 
 LABEL maintainer="Vijay Jangir <6284383+vijay-jangir@users.noreply.github.com>" \
