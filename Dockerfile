@@ -4,7 +4,7 @@ ARG PYTHON_VERSION=3.11.8
 ARG VARIANT=alpine
 FROM python:${PYTHON_VERSION}-${VARIANT}
 ARG PRE_COMMIT_VERSION=3.6.2
-ARG PACKAGES_LIST="git bash"
+ARG PACKAGES_LIST="bash"
 
 LABEL maintainer="Vijay Jangir <6284383+vijay-jangir@users.noreply.github.com>" \
       version="1.0" \
@@ -19,7 +19,7 @@ ENV PIP_DEFAULT_TIMEOUT=100 \
 
 # package installs with mount
 RUN --mount=type=cache,target=/var/cache/apk,sharing=locked \
-    apk add ${PACKAGES_LIST} 
+    apk add git ${PACKAGES_LIST} 
 
 # pip install with mount
 RUN --mount=type=cache,target=/root/.cache/pip \

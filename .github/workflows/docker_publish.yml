@@ -40,7 +40,7 @@ jobs:
             type=ref,event=pr
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
-            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=latest
 
 
       - name: Extract metadata (tags, labels) for Docker jdk 17 Image
@@ -53,7 +53,7 @@ jobs:
             type=ref,event=pr,suffix=-java17
             type=semver,pattern={{version}},suffix=-java17
             type=semver,pattern={{major}}.{{minor}},suffix=-java17
-            type=raw,value=latest,enable={{is_default_branch}},suffix=-java17
+            type=raw,value=latest,suffix=-java17
 
     
       - name: Extract metadata (tags, labels) for Docker jdk21 Image
@@ -66,7 +66,7 @@ jobs:
             type=ref,event=pr,suffix=-java21
             type=semver,pattern={{version}},suffix=-java21
             type=semver,pattern={{major}}.{{minor}},suffix=-java21
-            type=raw,value=latest,enable={{is_default_branch}},suffix=-java21
+            type=raw,value=latest,suffix=-java21
 
       
                 
@@ -75,6 +75,9 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
+          # some CI require bash, so adding it as default
+          build-args: |
+            PACKAGES_LIST=bash
           push: true
           tags: ${{ steps.meta_base.outputs.tags }}
           labels: ${{ steps.meta_base.outputs.labels }}
@@ -83,9 +86,10 @@ jobs:
         uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
         with:
           context: .
-          file: ./Dockerfile
+          file: ./Dockerfile.extend
           build-args: |
-            PACKAGES_LIST=git bash openjdk17 maven
+            PACKAGES_LIST=git bash openjdk17-jre maven
+            BASE_IMAGE=vijayjangir/pre-commit:latest
           push: true
           tags: ${{ steps.meta_jdk17.outputs.tags }}
           labels: ${{ steps.meta_jdk17.outputs.labels }}
@@ -96,13 +100,12 @@ jobs:
           context: .
           file: ./Dockerfile
           build-args: |
-            PACKAGES_LIST=git bash openjdk21 maven
+            PACKAGES_LIST=openjdk21-jre maven
+            BASE_IMAGE=vijayjangir/pre-commit:latest
           push: true
           tags: ${{ steps.meta_jdk21.outputs.tags }}
           labels: ${{ steps.meta_jdk21.outputs.labels }}
-  
-  
-      
+
       - name: "Docker Hub Description"
         uses: peter-evans/dockerhub-description@v3
         with:
