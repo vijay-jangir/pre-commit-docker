@@ -1,18 +1,10 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
-# GitHub recommends pinning actions to a commit SHA.
-# To get a newer version, you will need to update the SHA.
-# You can also reference a tag or branch, but the action may change without warning.
-
 name: Publish Docker image
 
 on:
   push:
     branches:
       - 'main'
+      - 'matrix'
     tags:
       - 'v*'
 
@@ -20,6 +12,20 @@ jobs:
   push_to_registry:
     name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ARGUMENTS:
+          - PACKAGES_LIST: bash
+            SUFFIX: ''
+          - PACKAGES_LIST: openjdk17
+            SUFFIX: -java17
+          - PACKAGES_LIST: openjdk21
+            SUFFIX: -java21
+          - PACKAGES_LIST: 'openjdk17 maven'
+            SUFFIX: -java17-maven
+          - PACKAGES_LIST: 'openjdk21 maven'
+            SUFFIX: -java21-maven
+
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
@@ -31,82 +37,29 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Extract metadata (tags, labels) for Docker base Image
-        id: meta_base
+        id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
           images: vijayjangir/pre-commit
           tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=raw,value=latest
+            type=ref,event=branch,suffix=${{ matrix.ARGUMENTS.SUFFIX}}
+            type=ref,event=pr,suffix=${{ matrix.ARGUMENTS.SUFFIX}}
+            type=semver,pattern={{version}},suffix=${{ matrix.ARGUMENTS.SUFFIX}}
+            type=semver,pattern={{major}}.{{minor}},suffix=${{ matrix.ARGUMENTS.SUFFIX}}
+            type=raw,value=latest,suffix=${{ matrix.ARGUMENTS.SUFFIX}}
 
-
-      - name: Extract metadata (tags, labels) for Docker jdk 17 Image
-        id: meta_jdk17
-        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
-        with:
-          images: vijayjangir/pre-commit
-          tags: |
-            type=ref,event=branch,suffix=-java17
-            type=ref,event=pr,suffix=-java17
-            type=semver,pattern={{version}},suffix=-java17
-            type=semver,pattern={{major}}.{{minor}},suffix=-java17
-            type=raw,value=latest,suffix=-java17
-
-    
-      - name: Extract metadata (tags, labels) for Docker jdk21 Image
-        id: meta_jdk21
-        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
-        with:
-          images: vijayjangir/pre-commit
-          tags: |
-            type=ref,event=branch,suffix=-java21
-            type=ref,event=pr,suffix=-java21
-            type=semver,pattern={{version}},suffix=-java21
-            type=semver,pattern={{major}}.{{minor}},suffix=-java21
-            type=raw,value=latest,suffix=-java21
-
-      
-                
-      - name: Build and push Docker image base
-        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
-        with:
-          context: .
-          file: ./Dockerfile
-          # some CI require bash, so adding it as default
-          build-args: |
-            PACKAGES_LIST=bash
-          push: true
-          tags: ${{ steps.meta_base.outputs.tags }}
-          labels: ${{ steps.meta_base.outputs.labels }}
-
-      - name: Build and push Docker image jdk17
-        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
-        with:
-          context: .
-          file: ./Dockerfile.extend
-          build-args: |
-            PACKAGES_LIST=git bash openjdk17-jre maven
-            BASE_IMAGE=vijayjangir/pre-commit:latest
-          push: true
-          tags: ${{ steps.meta_jdk17.outputs.tags }}
-          labels: ${{ steps.meta_jdk17.outputs.labels }}
-  
-      - name: Build and push Docker image jdk21
+      - name: Build and push Docker image
         uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
         with:
           context: .
           file: ./Dockerfile
           build-args: |
-            PACKAGES_LIST=openjdk21-jre maven
-            BASE_IMAGE=vijayjangir/pre-commit:latest
+            PACKAGES_LIST=${{ matrix.ARGUMENTS.PACKAGES_LIST }}
           push: true
-          tags: ${{ steps.meta_jdk21.outputs.tags }}
-          labels: ${{ steps.meta_jdk21.outputs.labels }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
 
-      - name: "Docker Hub Description"
+      - name: Docker Hub Description
         uses: peter-evans/dockerhub-description@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
