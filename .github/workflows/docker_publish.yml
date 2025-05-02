@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        PRE_COMMIT_VERSION: [3.7.0, 4.2.0]
         ARGUMENTS:
           - PACKAGES_LIST: bash
             SUFFIX: ''
@@ -88,6 +89,7 @@ jobs:
             PACKAGES_LIST=${{ matrix.ARGUMENTS.PACKAGES_LIST }}
             SCALA_VERSION=${{ matrix.ARGUMENTS.SCALA_VERSION }}
             INSTALL_COURSIER=${{ matrix.ARGUMENTS.INSTALL_COURSIER }}
+            PRE_COMMIT_VERSION=${{ matrix.PRE_COMMIT_VERSION }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
