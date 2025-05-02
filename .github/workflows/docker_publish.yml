@@ -16,14 +16,36 @@ jobs:
         ARGUMENTS:
           - PACKAGES_LIST: bash
             SUFFIX: ''
+            SCALA_VERSION: ''
+            INSTALL_COURSIER: false
           - PACKAGES_LIST: bash openjdk17-jre
             SUFFIX: -java17
+            SCALA_VERSION: ''
+            INSTALL_COURSIER: false
           - PACKAGES_LIST: bash openjdk21-jre
             SUFFIX: -java21
+            SCALA_VERSION: ''
+            INSTALL_COURSIER: false
           - PACKAGES_LIST: 'bash openjdk17-jre maven'
             SUFFIX: -java17-maven
+            SCALA_VERSION: ''
+            INSTALL_COURSIER: false
           - PACKAGES_LIST: 'bash openjdk21-jre maven'
             SUFFIX: -java21-maven
+            SCALA_VERSION: ''
+            INSTALL_COURSIER: false
+          - PACKAGES_LIST: 'bash openjdk17-jre curl'
+            SUFFIX: -scala2.12-sbt
+            SCALA_VERSION: '2.12.20' # Specify exact Scala version
+            INSTALL_COURSIER: true
+          - PACKAGES_LIST: 'bash openjdk17-jre curl'
+            SUFFIX: -scala2.13-sbt
+            SCALA_VERSION: '2.13.14' # Specify exact Scala version
+            INSTALL_COURSIER: true
+          - PACKAGES_LIST: 'bash openjdk17-jre curl' # Added curl, removed wget
+            SUFFIX: -scala3-sbt
+            SCALA_VERSION: '3.3.3'
+            INSTALL_COURSIER: true
 
     steps:
       - name: Check out the repo
@@ -57,6 +79,8 @@ jobs:
           file: ./Dockerfile
           build-args: |
             PACKAGES_LIST=${{ matrix.ARGUMENTS.PACKAGES_LIST }}
+            SCALA_VERSION=${{ matrix.ARGUMENTS.SCALA_VERSION }}
+            INSTALL_COURSIER=${{ matrix.ARGUMENTS.INSTALL_COURSIER }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
