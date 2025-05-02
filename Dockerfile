@@ -34,7 +34,13 @@ RUN --mount=type=cache,id=apk-cache-${TARGETARCH},target=/var/cache/apk,sharing=
 RUN --mount=type=cache,id=pip-cache-${TARGETARCH},target=/root/.cache/pip \
     pip install "pre-commit==${PRE_COMMIT_VERSION}"
 
-# Install Coursier and then use it to install Scala/SBT if requested
+
+# configuration
+ENV XDG_CACHE_HOME=/tmp/.cache \
+    XDG_CONFIG_HOME=/tmp/.config \
+    COURSIER_CACHE=/tmp/.cache/coursier
+
+    # Install Coursier and then use it to install Scala/SBT if requested
 RUN if [ "$INSTALL_COURSIER" = "true" ] ; then \
       echo "Installing Coursier..." ; \
       curl -fLo /usr/local/bin/cs https://github.com/coursier/launchers/raw/master/coursier && \
@@ -56,12 +62,6 @@ RUN if [ "$INSTALL_COURSIER" = "true" ] ; then \
     else \
       echo "Skipping Coursier installation." ; \
     fi
-
-
-# configuration
-ENV XDG_CACHE_HOME=/tmp/.cache \
-    XDG_CONFIG_HOME=/tmp/.config \
-    COURSIER_CACHE=/tmp/.cache/coursier
 
 RUN git config --system --add safe.directory '*' \
     && adduser -S -D -H pre-commit \
