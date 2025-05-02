@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        PRE_COMMIT_VERSION: [3.7.0, 4.2.0]
         ARGUMENTS:
           - PACKAGES_LIST: bash
             SUFFIX: ''
@@ -36,13 +37,13 @@ jobs:
             INSTALL_COURSIER: false
           - PACKAGES_LIST: 'bash openjdk17-jre curl'
             SUFFIX: -scala2.12-sbt
-            SCALA_VERSION: '2.12.20' # Specify exact Scala version
+            SCALA_VERSION: '2.12.20'
             INSTALL_COURSIER: true
           - PACKAGES_LIST: 'bash openjdk17-jre curl'
             SUFFIX: -scala2.13-sbt
-            SCALA_VERSION: '2.13.14' # Specify exact Scala version
+            SCALA_VERSION: '2.13.14'
             INSTALL_COURSIER: true
-          - PACKAGES_LIST: 'bash openjdk17-jre curl' # Added curl, removed wget
+          - PACKAGES_LIST: 'bash openjdk17-jre curl'
             SUFFIX: -scala3-sbt
             SCALA_VERSION: '3.3.3'
             INSTALL_COURSIER: true
@@ -70,7 +71,7 @@ jobs:
           images: vijayjangir/pre-commit
           flavor: |
             latest=auto
-            suffix=${{ matrix.ARGUMENTS.SUFFIX }},onlatest=true
+            suffix=-${{ matrix.PRE_COMMIT_VERSION }}-${{ matrix.ARGUMENTS.SUFFIX }},onlatest=true
 
           tags: |
             type=ref,event=branch
@@ -88,6 +89,7 @@ jobs:
             PACKAGES_LIST=${{ matrix.ARGUMENTS.PACKAGES_LIST }}
             SCALA_VERSION=${{ matrix.ARGUMENTS.SCALA_VERSION }}
             INSTALL_COURSIER=${{ matrix.ARGUMENTS.INSTALL_COURSIER }}
+            PRE_COMMIT_VERSION=${{ matrix.PRE_COMMIT_VERSION }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
