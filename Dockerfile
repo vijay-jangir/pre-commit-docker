@@ -44,7 +44,12 @@ RUN if [ "$INSTALL_COURSIER" = "true" ] ; then \
         echo "Installing Scala version ${SCALA_VERSION} using Coursier..."; \
         cs install "scala:${SCALA_VERSION}" --install-dir /usr/local/bin && \
         echo "Installing sbt using Coursier..."; \
-        cs install sbt --install-dir /usr/local/bin; \
+        cs install sbt --install-dir /usr/local/bin && \
+        # Force setup by checking versions
+        echo "Verifying cs, scala and SBT installation..." && \
+        cs version && \
+        scala -version && \
+        sbt --version; \
       else \
         echo "SCALA_VERSION not set, skipping Scala/SBT installation via Coursier."; \
       fi; \
