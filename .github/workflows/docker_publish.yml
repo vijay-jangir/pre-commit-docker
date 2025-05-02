@@ -83,11 +83,11 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          platforms: linux/amd64,linux/arm64 # Specify target platforms
+          platforms: linux/amd64,linux/arm64
           build-args: |
             PACKAGES_LIST=${{ matrix.ARGUMENTS.PACKAGES_LIST }}
             SCALA_VERSION=${{ matrix.ARGUMENTS.SCALA_VERSION }}
-            INSTALL_COURSIER=${{ matrix.ARGUMENTS.INSTALL_COURSIER }} # Pass Coursier flag
+            INSTALL_COURSIER=${{ matrix.ARGUMENTS.INSTALL_COURSIER }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

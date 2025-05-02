@@ -27,11 +27,11 @@ ENV PIP_DEFAULT_TIMEOUT=100 \
     SAMPLE_PRE_COMMIT_CONFIG=/home/pre-commit/.pre-commit-config.yaml
 
 # package installs with mount
-RUN --mount=type=cache,target=/var/cache/apk,sharing=locked \
-    apk add git ${PACKAGES_LIST} 
+RUN --mount=type=cache,id=apk-cache-${TARGETARCH},target=/var/cache/apk,sharing=locked \
+    apk update && apk add git ${PACKAGES_LIST} 
 
 # pip install with mount
-RUN --mount=type=cache,target=/root/.cache/pip \
+RUN --mount=type=cache,id=pip-cache-${TARGETARCH},target=/root/.cache/pip \
     pip install "pre-commit==${PRE_COMMIT_VERSION}"
 
 # Install Coursier and then use it to install Scala/SBT if requested
